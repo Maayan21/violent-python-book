@@ -16,6 +16,7 @@ def testpass(password, dictionary):
 
 def main():
 	dictionaryFile = open('dictionary.txt', 'r')
+	# Warning: it will run out of memory with huge password lists but for learning it is ok
 	dictionary = [x.strip() for x in dictionaryFile.readlines()]
 	dictionaryFile.close();
 	passwordFile = open('shadow', 'r')
