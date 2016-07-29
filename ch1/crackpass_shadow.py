@@ -1,3 +1,7 @@
+#
+# For the passlib see https://pythonhosted.org/passlib/lib/passlib.context-tutorial.html#context-overview
+# Shadow file format explanation and example file is from http://www.yourownlinux.com/2015/08/etc-shadow-file-format-in-linux-explained.html
+#
 from passlib.context import CryptContext
 
 def testpass(password, dictionary):
