@@ -42,7 +42,7 @@ def checkPort(resolvedHost, port):
 		try:
 			s.send('Hello, world!i\r\n')
 			resultString = s.recv(100)
-			resultString = resultString.split("\n", 2)[0]
+			resultString = resultString.split("\n", 2)[0].strip("\r")
 		except:
 			pass
 	s.close()
