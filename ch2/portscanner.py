@@ -29,6 +29,7 @@ def checkPort(resolvedHost, port):
 	"""
 	Checks if the port is open
 	"""
+	resultString = ''
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	s.settimeout(5)
 	try:
@@ -36,9 +37,17 @@ def checkPort(resolvedHost, port):
 		result = True
 	except:
 		result = False
-	s.close
+	if result:
+		# Port is open, try to get the banner
+		try:
+			s.send('Hello, world!i\r\n')
+			resultString = s.recv(100)
+			resultString = resultString.split("\n", 2)[0]
+		except:
+			pass
+	s.close()
 
-	return result
+	return (result, resultString)
 
 
 def main():
@@ -51,8 +60,9 @@ def main():
 
 	for port in portList.split(','):
 		port = int(port.strip())
-		if checkPort(resolvedHost, port):
-			print "Port %5d is open" % (port)
+		(result, resultString) = checkPort(resolvedHost, port)
+		if result:
+			print "Port %5d is open. Response: '%s'" % (port, resultString)
 		else:
 			print "Port %5d is closed" % (port)
 
