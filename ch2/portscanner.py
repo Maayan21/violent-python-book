@@ -49,9 +49,9 @@ def checkPort(resolvedHost, port):
 
 	lock.acquire();
 	if result:
-		print "Port %5d is open. Response: '%s'" % (port, resultString)
+		print "Port %5d/tcp is open. Response: '%s'" % (port, resultString)
 	else:
-		print "Port %5d is closed" % (port)
+		print "Port %5d/tcp is closed" % (port)
 	lock.release()
 
 
