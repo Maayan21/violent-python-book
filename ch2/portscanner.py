@@ -40,7 +40,7 @@ def checkPort(resolvedHost, port):
 	if result:
 		# Port is open, try to get the banner
 		try:
-			s.send('Hello, world!i\r\n')
+			s.send("Hello, world!\r\n")
 			resultString = s.recv(100)
 			resultString = resultString.split("\n", 2)[0].strip("\r")
 		except:
