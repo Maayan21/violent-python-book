@@ -1,10 +1,10 @@
 import optparse
 import socket
-from threading import Thread
+import threading
 
 hostName = '127.0.0.1'
 portList = '21,25,80,110'
-
+lock = threading.Semaphore(value = 1)
 
 def parseArguments():
 	"""
@@ -47,10 +47,12 @@ def checkPort(resolvedHost, port):
 			pass
 	s.close()
 
+	lock.acquire();
 	if result:
 		print "Port %5d is open. Response: '%s'" % (port, resultString)
 	else:
 		print "Port %5d is closed" % (port)
+	lock.release()
 
 
 def main():
@@ -63,7 +65,7 @@ def main():
 
 	for port in portList.split(','):
 		port = int(port.strip())
-		thread = Thread(target = checkPort, args = (resolvedHost, port))
+		thread = threading.Thread(target = checkPort, args = (resolvedHost, port))
 		thread.start()
 
 
