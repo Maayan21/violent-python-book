@@ -5,26 +5,43 @@ import zipfile
 
 
 def getTempDir():
+	"""
+	Returns the temporarary directory path (or the current path if the system has no temporary directory)
+	"""
 	tempDir = tempfile.gettempdir()
 	if tempDir == None:
 		tempDir = os.getcwd()
 
 	return tempDir
 
+
 def findSmallestFileInZip(zipFile):
+	"""
+	Finds the smallest file in the zip file and aborts with the error if there is no files in the archive.
+
+	zipFile: zipfile.ZipFile
+	"""
 	foundSize = -1
 	fileName = None
 	for zipInfo in zipFile.infolist():
-		if zipInfo.fileSize < foundSize or foundSize < 0:
-			foundSize = zipInfo.filename
+		if zipInfo.file_size < foundSize or foundSize < 0:
+			foundSize = zipInfo.file_size
+			fileName = zipInfo.filename
 
 	return fileName
 
 
 def checkIfZipHasPassword(zipFile, smallestFile):
+	"""
+	Checks if the zipFile has a password and aborts with a error message if not.
+
+	zipFile: zipfile.ZipFile
+	smallestFile: string - name of the file in the archive
+	"""
 	try:
 		tempDir = getTempDir()
 		realPath = zipFile.extract(smallestFile, tempDir)
+		result = False
 		try:
 			# Clean up
 			os.unlink(realPath)
@@ -34,39 +51,63 @@ def checkIfZipHasPassword(zipFile, smallestFile):
 		except:
 			# Can't do anything here...
 			pass
-		print "Zip file does not have password protection\n"
-		exit(1)
 	except:
 		# Seems to have the password
-		pass
+		result = True
+
+	return result
+
 
 def crackZipPassword(zipFileName, dictionaryFileName):
-	zipFile = zipfile.ZipFile(zipFIleName, 'r');
+	"""
+	Executes a dictionary attack on the zip file.
+	"""
+	zipFile = zipfile.ZipFile(zipFileName, 'r');
 	smallestFile = findSmallestFileInZip(zipFile)
+
 	if smallestFile == None:
 		print "Zip archive is empty\n"
-		exit(1)
-	checkIfZipHasPassword(zipFile, smallestFile)
-	dictoinaryFile = open(dictionaryFileName, 'r');
+		return
+
+	if not checkIfZipHasPassword(zipFile, smallestFile):
+		print "Zip file does not have password protection"
+		return
+
+	dictionaryFile = open(dictionaryFileName, 'r');
+	tempDir = getTempDir()
+	foundPassword = None
 	for password in dictionaryFile:
-		# TODO
-		pass
+		try:
+			password = password.rstrip("\r\n");
+			zipFile.extract(smallestFile, tempDir, password)
+			foundPassword = password
+			break
+		except:
+			# Bad password
+			pass
 	dictionaryFile.close()
+	if foundPassword == None:
+		print "Password is not in the dictionary"
+	else:
+		print "Found password: '%s'" % (password)
+
 
 def main():
-	if sys.argc != 3:
-		print "Format: crackzip filename.zip dictionary.txt\n"
-		exit(1)
-
-	fileName = sys.argv[1]
-	dictionary = sys.argv[2]
-	if os.path.exists(fileName) and os.path.isfile(fileName):
-		if os.path.exists(dictionaty) and os.path.isfile(dictionary):
-			crackZipPassword(fileName)
-		else:
-			print "Dictionary file '%s' does not exist\n" % (dictionary)
-			exit(1)
+	"""
+	Runs the cracker.
+	"""
+	if len(sys.argv) != 3:
+		print "Format: python crackzip.py filename.zip dictionary.txt\n"
 	else:
-		print "File '%s' does not exist\n" % (fileName)
-		exit(1)
+		fileName = sys.argv[1]
+		dictionary = sys.argv[2]
+		if os.path.exists(fileName) and os.path.isfile(fileName):
+			if os.path.exists(dictionary) and os.path.isfile(dictionary):
+				crackZipPassword(fileName, dictionary)
+			else:
+				print "Dictionary file '%s' does not exist\n" % (dictionary)
+		else:
+			print "File '%s' does not exist\n" % (fileName)
+
+main()
 
