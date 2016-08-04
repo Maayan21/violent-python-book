@@ -1,6 +1,6 @@
 import optparse
 import socket
-
+from threading import Thread
 
 hostName = '127.0.0.1'
 portList = '21,25,80,110'
@@ -47,7 +47,10 @@ def checkPort(resolvedHost, port):
 			pass
 	s.close()
 
-	return (result, resultString)
+	if result:
+		print "Port %5d is open. Response: '%s'" % (port, resultString)
+	else:
+		print "Port %5d is closed" % (port)
 
 
 def main():
@@ -60,11 +63,8 @@ def main():
 
 	for port in portList.split(','):
 		port = int(port.strip())
-		(result, resultString) = checkPort(resolvedHost, port)
-		if result:
-			print "Port %5d is open. Response: '%s'" % (port, resultString)
-		else:
-			print "Port %5d is closed" % (port)
+		thread = Thread(target = checkPort, args = (resolvedHost, port))
+		thread.start()
 
 
 main()
