@@ -66,7 +66,7 @@ def crackZipPassword(zipFileName, dictionaryFileName):
 	smallestFile = findSmallestFileInZip(zipFile)
 
 	if smallestFile == None:
-		print "Zip archive is empty\n"
+		print "Zip archive is empty"
 		return
 
 	if not checkIfZipHasPassword(zipFile, smallestFile):
@@ -97,7 +97,7 @@ def main():
 	Runs the cracker.
 	"""
 	if len(sys.argv) != 3:
-		print "Format: python crackzip.py filename.zip dictionary.txt\n"
+		print "Format: python crackzip.py filename.zip dictionary.txt"
 	else:
 		fileName = sys.argv[1]
 		dictionary = sys.argv[2]
@@ -105,9 +105,9 @@ def main():
 			if os.path.exists(dictionary) and os.path.isfile(dictionary):
 				crackZipPassword(fileName, dictionary)
 			else:
-				print "Dictionary file '%s' does not exist\n" % (dictionary)
+				print "Dictionary file '%s' does not exist" % (dictionary)
 		else:
-			print "File '%s' does not exist\n" % (fileName)
+			print "File '%s' does not exist" % (fileName)
 
 main()
 
