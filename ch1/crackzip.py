@@ -6,7 +6,7 @@ import zipfile
 
 def getTempDir():
 	"""
-	Returns the temporarary directory path (or the current path if the system has no temporary directory)
+	Returns the temporarary directory path (or the current path if the system has no temporary directory).
 	"""
 	tempDir = tempfile.gettempdir()
 	if tempDir == None:
@@ -17,7 +17,7 @@ def getTempDir():
 
 def findSmallestFileInZip(zipFile):
 	"""
-	Finds the smallest file in the zip file and aborts with the error if there is no files in the archive.
+	Finds the smallest file in the zip file.
 
 	zipFile: zipfile.ZipFile
 	"""
@@ -33,7 +33,7 @@ def findSmallestFileInZip(zipFile):
 
 def checkIfZipHasPassword(zipFile, smallestFile):
 	"""
-	Checks if the zipFile has a password and aborts with a error message if not.
+	Checks if the zipFile has a password.
 
 	zipFile: zipfile.ZipFile
 	smallestFile: string - name of the file in the archive
@@ -60,7 +60,7 @@ def checkIfZipHasPassword(zipFile, smallestFile):
 
 def crackZipPassword(zipFileName, dictionaryFileName):
 	"""
-	Executes a dictionary attack on the zip file.
+	Executes a dictionary attack on the zip file. Parameters are self-explanatory.
 	"""
 	zipFile = zipfile.ZipFile(zipFileName, 'r');
 	smallestFile = findSmallestFileInZip(zipFile)
