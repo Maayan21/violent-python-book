@@ -8,8 +8,9 @@ def checkSshKey(host, user, keyPath):
 	Checks if the key can be used for connection.
 	"""
 	keyWorked = False
-	shellCommand = 'ssh -l %s -i %s -o PasswordAuthentication=no %s exit > /dev/null 2>&1' % (user, keyPath, host)
-	if subprocess.call(shellCommand, shell = True) == 0:
+	shellCommand = 'ssh -v -l %s -i %s -o BatchMode=yes %s exit < /dev/null > /dev/null 2>&1' % (user, keyPath, host)
+	process = subprocess.Popen(shellCommand, shell = True, close_fds = True)
+	if process.wait() == 0:
 		keyWorked = True
 
 	return keyWorked
