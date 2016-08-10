@@ -1,19 +1,23 @@
 import optparse
 import os
 import subprocess
+import threading
+import time
+import Queue
 
 
-def checkSshKey(host, user, keyPath):
+queue = Queue.Queue()
+
+def checkSshKey(host, user):
 	"""
 	Checks if the key can be used for connection.
 	"""
-	keyWorked = False
-	shellCommand = 'ssh -v -l %s -i %s -o BatchMode=yes %s exit < /dev/null > /dev/null 2>&1' % (user, keyPath, host)
-	process = subprocess.Popen(shellCommand, shell = True, close_fds = True)
-	if process.wait() == 0:
-		keyWorked = True
-
-	return keyWorked
+	while not queue.empty():
+		keyPath = queue.get()
+		shellCommand = 'ssh -v -l %s -i %s -o BatchMode=yes %s exit < /dev/null > /dev/null 2>&1' % (user, keyPath, host)
+		process = subprocess.Popen(shellCommand, shell = True, close_fds = True)
+		if process.wait() == 0:
+			print "Usable key: " + keyPath
 
 
 def main():
@@ -34,9 +38,18 @@ def main():
 	for entry in os.listdir(options.keysDir):
 		path = options.keysDir + os.sep + entry
 		if not path.endswith('.pub') and os.path.isfile(path):
-			if checkSshKey(options.host, options.user, path):
-				print "Usable key: " + path
+			queue.put(path)
 
+	queueSize = queue.qsize()
+
+	for index in range(0,5):
+		thread = threading.Thread(target = checkSshKey, args = (options.host, options.user))
+		thread.setDaemon(True)
+		thread.start()
+
+	while not queue.empty():
+		time.sleep(5)
+		print "Processed %d entries of %d" % (queueSize - queue.qsize(), queue.qsize())
 
 main()
 
