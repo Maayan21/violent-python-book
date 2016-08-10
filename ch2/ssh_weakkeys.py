@@ -1,3 +1,6 @@
+#
+# See also: https://www.exploit-db.com/exploits/5720/
+#
 import optparse
 import os
 import subprocess
