@@ -40,16 +40,22 @@ for (ts, buffer) in reader:
 			try:
 				record = geoIp.record_by_name(destinationIpAddress)
 				geoInfo = ''
+				print str(record)
 				if record['city'] != '':
 					geoInfo = record['city']
 				if record['country_code3']:
 					if geoInfo != '':
 						geoInfo = geoInfo + ', '
 					geoInfo = geoInfo + record['country_code3']
+				if record['longitude'] is not None and record['latitude'] is not None:
+					if geoInfo != '':
+						geoInfo = geoInfo + ', '
+					geoInfo = geoInfo + str(record['longitude']) + ', ' + str(record['latitude'])
 				if geoInfo == '':
 					geoInfo = 'no geo info'
 				geoCache[destinationIpAddress] = '(' + geoInfo + ')'
-			except:
+			except Exception, e:
+				print str(e)
 				geoCache[destinationIpAddress] = '(cannot resolve)'
 		print "%s -> %s (%s; %s)" % (sourceIpAddress, destinationIpAddress, geoCache[destinationIpAddress], nsCache[destinationIpAddress])
 	except:
