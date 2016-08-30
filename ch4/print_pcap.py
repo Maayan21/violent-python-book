@@ -35,12 +35,11 @@ for (ts, buffer) in reader:
 			try:
 				nsCache[destinationIpAddress] = socket.gethostbyaddr(destinationIpAddress)[0]
 			except:
-				nsCache[destinationIpAddress] = '?'
+				nsCache[destinationIpAddress] = 'no dns'
 		if destinationIpAddress not in geoCache:
 			try:
 				record = geoIp.record_by_name(destinationIpAddress)
 				geoInfo = ''
-				print str(record)
 				if record['city'] != '':
 					geoInfo = record['city']
 				if record['country_code3']:
@@ -53,11 +52,15 @@ for (ts, buffer) in reader:
 					geoInfo = geoInfo + str(record['longitude']) + ', ' + str(record['latitude'])
 				if geoInfo == '':
 					geoInfo = 'no geo info'
-				geoCache[destinationIpAddress] = '(' + geoInfo + ')'
+				geoCache[destinationIpAddress] = geoInfo
 			except Exception, e:
-				print str(e)
-				geoCache[destinationIpAddress] = '(cannot resolve)'
-		print "%s -> %s (%s; %s)" % (sourceIpAddress, destinationIpAddress, geoCache[destinationIpAddress], nsCache[destinationIpAddress])
+				geoCache[destinationIpAddress] = 'no geo'
+		try:
+			http = dpkt.http.Request(ipAddresses.data.data)
+			uri = '//' + http.headers['host'] + http.uri
+		except:
+			uri = 'no uri'
+		print "%s -> %s\n\t%s\n\t%s\n\t%s" % (sourceIpAddress, destinationIpAddress, geoCache[destinationIpAddress], nsCache[destinationIpAddress], uri)
 	except:
 		print "Malformed packet?"
 
